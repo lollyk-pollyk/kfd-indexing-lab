@@ -10,7 +10,7 @@ class ProductSelectionTest {
         val mouse = Product(2, "Mouse", false)
         val monitor = Product(3, "Monitor", true)
         val webcam = Product(4, "Webcam", true)
-        val products = listOf(keyboard, mouse, monitor, webcam)
+        val products = listOf(webcam, keyboard, mouse, monitor)
 
         val result = selectProducts(
             products,
@@ -67,5 +67,36 @@ class ProductSelectionTest {
         )
 
         assertEquals(emptyList<Product>(), result)
+    }
+
+    @Test
+    fun returnsEmptyListWhenCatalogIsEmpty() {
+        val result = selectProducts(
+            emptyList(),
+            listOf(1L, 2L, 3L),
+            emptyList()
+        )
+
+        assertEquals(emptyList<Product>(), result)
+    }
+
+    @Test
+    fun doesNotModifyInputsAndKeepsCallsIndependent() {
+        val keyboard = Product(1, "Keyboard", true)
+        val monitor = Product(2, "Monitor", true)
+
+        val products = mutableListOf(keyboard, monitor)
+        val recommendedIds = mutableListOf(2L, 1L, 2L)
+        val excludedIds = mutableListOf<Long>()
+
+        val firstResult = selectProducts(products, recommendedIds, excludedIds)
+        val secondResult = selectProducts(products, recommendedIds, excludedIds)
+
+        assertEquals(listOf(monitor, keyboard), firstResult)
+        assertEquals(firstResult, secondResult)
+
+        assertEquals(listOf(keyboard, monitor), products)
+        assertEquals(listOf(2L, 1L, 2L), recommendedIds)
+        assertEquals(emptyList<Long>(), excludedIds)
     }
 }
